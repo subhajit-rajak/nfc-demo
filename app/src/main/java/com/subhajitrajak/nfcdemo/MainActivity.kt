@@ -41,14 +41,12 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this, WriteData::class.java)
                 startActivity(intent)
             }
-            //nfc process start
-//            pendingIntent = PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0)
 
+            val intent = Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_MUTABLE)
+                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
             } else {
-                PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-                    PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
             }
 
             val ndef = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED)
@@ -71,7 +69,7 @@ class MainActivity : AppCompatActivity() {
             } else if (!nfcAdapter!!.isEnabled) {
                 val builder = AlertDialog.Builder(this@MainActivity, R.style.MyAlertDialogStyle)
                 builder.setTitle("NFC Disabled")
-                builder.setMessage("Plesae Enable NFC")
+                builder.setMessage("Please Enable NFC")
                 binding.txtviewshopid.text = "NFC IS NOT ENABLED. PLEASE ENABLE NFC IN SETTINGS->NFC"
                 binding.txtviewmachineid.visibility = View.INVISIBLE
 
