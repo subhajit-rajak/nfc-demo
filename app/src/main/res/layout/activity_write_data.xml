@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    tools:context=".MainActivity">
+    tools:context=".WriteData">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -22,15 +22,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="Read NFC Data"
+            android:text="Write NFC Data"
             android:textSize="20sp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="Bring near the NFC tag to the device!"
+            android:padding="16dp"
+            android:text="Enter the text in the below text box and bring the nfc tag near!"
+            android:textAlignment="center"
             android:textSize="16sp" />
+
     </LinearLayout>
 
     <LinearLayout
@@ -44,57 +47,34 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/txtviewshopid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="Shop ID will be here!"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txtviewmachineid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="Machine ID will be here!"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:id="@+id/txtviewuserid"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="User ID will be here"
-            android:textSize="20sp"
-            android:textStyle="bold" />
 
         <EditText
-            android:id="@+id/txtuserid"
+            android:id="@+id/txtshopid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:hint="User ID"
+            android:hint="Shop ID"
             android:inputType="textPersonName"
             android:padding="15dp" />
 
-        <TextView
-            android:layout_width="wrap_content"
+        <EditText
+            android:id="@+id/txtmachineid"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="All the Readed contents will display above!"
-            android:textSize="16sp" />
+            android:layout_marginBottom="10dp"
+            android:hint="Machine ID"
+            android:inputType="textPersonName"
+            android:padding="15dp" />
+
 
         <Button
-            android:id="@+id/btnwrite"
+            android:id="@+id/btnback"
             style="@style/Widget.Material3.Button.IconButton.Outlined"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:foreground="?android:attr/selectableItemBackground"
-            android:text="Write NFC!"
+            android:text="Read NFC!"
             android:textAllCaps="false"
             android:textColor="#0099ff"
             android:textSize="17sp" />
@@ -106,6 +86,7 @@
             android:text="Testing Purposes"
             android:textAlignment="textEnd"
             android:textSize="13sp" />
+
     </LinearLayout>
 
 </RelativeLayout>
