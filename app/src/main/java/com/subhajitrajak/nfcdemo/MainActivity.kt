@@ -17,6 +17,8 @@ import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
 import com.subhajitrajak.nfcdemo.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -29,24 +31,44 @@ class MainActivity : AppCompatActivity() {
         NfcAdapter.getDefaultAdapter(this)
     }
     private var pendingIntent: PendingIntent? = null
+    private lateinit var database: DatabaseReference
+    private var ndefMessage: NdefMessage? = null// Firebase database reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
         enableEdgeToEdge()
 
-        try {
+        // Initialize Firebase database reference
+        database = FirebaseDatabase.getInstance().reference
 
+        try {
+            // Click listener for NFC writing
             binding.btnwrite.setOnClickListener {
-                val intent = Intent(this, WriteData::class.java)
-                startActivity(intent)
+                val dataToWrite = binding.txtuserid.text.toString()
+
+                // Ensure the user has entered data
+                if (dataToWrite.isNotEmpty()) {
+                    writeToNfcTag(dataToWrite)
+                } else {
+                    Toast.makeText(
+                        this,
+                        "Please enter data to write to NFC tag.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
             }
 
             val intent = Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
             pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
                 PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
             } else {
-                PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+                PendingIntent.getActivity(
+                    this,
+                    0,
+                    intent,
+                    PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE
+                )
             }
 
             val ndef = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED)
@@ -56,137 +78,122 @@ class MainActivity : AppCompatActivity() {
                 throw RuntimeException("fail", e)
             }
             intentFiltersArray = arrayOf(ndef)
+
+            // Check NFC availability and settings
             if (nfcAdapter == null) {
-                val builder = AlertDialog.Builder(this@MainActivity, R.style.MyAlertDialogStyle)
-                builder.setMessage("This device doesn't support NFC.")
-                builder.setPositiveButton("Cancel", null)
-                val myDialog = builder.create()
-                myDialog.setCanceledOnTouchOutside(false)
-                myDialog.show()
-                binding.txtviewshopid.text = "THIS DEVICE DOESN'T SUPPORT NFC. PLEASE TRY WITH ANOTHER DEVICE!"
-                binding.txtviewmachineid.visibility = View.INVISIBLE
-
+                showNfcNotSupportedDialog()
             } else if (!nfcAdapter!!.isEnabled) {
-                val builder = AlertDialog.Builder(this@MainActivity, R.style.MyAlertDialogStyle)
-                builder.setTitle("NFC Disabled")
-                builder.setMessage("Please Enable NFC")
-                binding.txtviewshopid.text = "NFC IS NOT ENABLED. PLEASE ENABLE NFC IN SETTINGS->NFC"
-                binding.txtviewmachineid.visibility = View.INVISIBLE
-
-                builder.setPositiveButton("Settings") { _, _ -> startActivity(Intent(Settings.ACTION_NFC_SETTINGS)) }
-                builder.setNegativeButton("Cancel", null)
-                val myDialog = builder.create()
-                myDialog.setCanceledOnTouchOutside(false)
-                myDialog.show()
+                showNfcDisabledDialog()
             }
-        }
-        catch (ex:Exception)
-        {
+        } catch (ex: Exception) {
             Toast.makeText(applicationContext, ex.message, Toast.LENGTH_SHORT).show()
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        nfcAdapter?.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, techListsArray)
+    private fun showNfcNotSupportedDialog() {
+        val builder = AlertDialog.Builder(this@MainActivity, R.style.MyAlertDialogStyle)
+        builder.setMessage("This device doesn't support NFC.")
+        builder.setPositiveButton("Cancel", null)
+        val myDialog = builder.create()
+        myDialog.setCanceledOnTouchOutside(false)
+        myDialog.show()
+        binding.txtviewshopid.text =
+            "THIS DEVICE DOESN'T SUPPORT NFC. PLEASE TRY WITH ANOTHER DEVICE!"
+        binding.txtviewmachineid.visibility = View.INVISIBLE
     }
 
+    private fun showNfcDisabledDialog() {
+        val builder = AlertDialog.Builder(this@MainActivity, R.style.MyAlertDialogStyle)
+        builder.setTitle("NFC Disabled")
+        builder.setMessage("Please Enable NFC")
+        binding.txtviewshopid.text = "NFC IS NOT ENABLED. PLEASE ENABLE NFC IN SETTINGS->NFC"
+        binding.txtviewmachineid.visibility = View.INVISIBLE
+        builder.setPositiveButton("Settings") { _, _ -> startActivity(Intent(Settings.ACTION_NFC_SETTINGS)) }
+        builder.setNegativeButton("Cancel", null)
+        val myDialog = builder.create()
+        myDialog.setCanceledOnTouchOutside(false)
+        myDialog.show()
+    }
 
-    var iswrite = "0"
+    // Write data to NFC tag
+    private fun writeToNfcTag(data: String) {
+        // Prepare the data for writing to NFC tag
+        val ndefMessage =
+            NdefMessage(arrayOf(NdefRecord.createMime("text/plain", data.toByteArray())))
 
-    var machineid="";
-    var shopid="";
+        // Save data to Firebase Realtime Database
+        val key = database.push().key ?: return
+        database.child("nfcTags").child(key).setValue(data).addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Toast.makeText(
+                    this,
+                    "Data saved to Firebase and ready to be written to NFC tag.",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                Toast.makeText(this, "Failed to save data to Firebase.", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+        // Enable foreground dispatch to handle NFC intents
+        enableForegroundDispatch()
+
+        // Save data to NFC tag when detected
+        Toast.makeText(this, "Bring NFC tag closer to write data.", Toast.LENGTH_SHORT).show()
+    }
+
+    // Enable foreground dispatch to capture NFC tag when the app is in the foreground
+    private fun enableForegroundDispatch() {
+        if (nfcAdapter != null && pendingIntent != null && intentFiltersArray != null) {
+            nfcAdapter!!.enableForegroundDispatch(
+                this,
+                pendingIntent,
+                intentFiltersArray,
+                techListsArray
+            )
+        }
+    }
+
+    // Handle NFC tag writing when NFC tag is detected
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
+        if (NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
+            val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG)
+            val ndef = Ndef.get(tag)
 
-
-        val action = intent.action
-        if (NfcAdapter.ACTION_NDEF_DISCOVERED == action) {
-
-            val parcelables = intent.getParcelableArrayExtra(NfcAdapter.EXTRA_NDEF_MESSAGES)
-            with(parcelables) {
+            if (ndef != null && ndefMessage != null) {
                 try {
-                    val inNdefMessage = this?.get(0) as NdefMessage
-                    val inNdefRecords = inNdefMessage.records
-                    //if there are many records, you can call inNdefRecords[1] as array
-                    var ndefRecord_0 = inNdefRecords[0]
-                    var inMessage = String(ndefRecord_0.payload)
-                    shopid = inMessage.drop(3);
-                    binding.txtviewshopid.text = "SHOP ID: " + shopid
-
-                    ndefRecord_0 = inNdefRecords[1]
-                    inMessage = String(ndefRecord_0.payload)
-                    machineid = inMessage.drop(3);
-                    binding.txtviewmachineid.text = "MACHINE ID: " + machineid
-
-                    if (!binding.txtuserid.text.toString().equals("")) {
-                        if (NfcAdapter.ACTION_TECH_DISCOVERED == intent.action
-                            || NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action
-                        ) {
-
-                            val tag =
-                                intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
-                            val ndef = Ndef.get(tag) ?: return
-
-                            if (ndef.isWritable) {
-
-                                var message = NdefMessage(
-                                    arrayOf(
-                                        NdefRecord.createTextRecord("en", shopid),
-                                        NdefRecord.createTextRecord("en", machineid),
-                                        NdefRecord.createTextRecord(
-                                            "en",
-                                            binding.txtuserid.text.toString()
-                                        )
-
-                                    )
-                                )
-
-
-                                ndef.connect()
-                                ndef.writeNdefMessage(message)
-                                ndef.close()
-
-                                binding.txtviewuserid.text = "USER ID: "+binding.txtuserid.text.toString();
-                                Toast.makeText(
-                                    applicationContext,
-                                    "Successfully Wrote!",
-                                    Toast.LENGTH_SHORT
-                                )
-                                    .show()
-                            }
-                        }
-                    } else {
-                        try {
-
-
-                            ndefRecord_0 = inNdefRecords[2]
-                            inMessage = String(ndefRecord_0.payload)
-
-                            binding.txtviewuserid.text = "USER ID: " + inMessage.drop(3)
-                        }
-                        catch (ex:Exception){
-                            Toast.makeText(applicationContext, "User ID not written!", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                } catch (ex: Exception) {
+                    ndef.connect()
+                    ndef.writeNdefMessage(ndefMessage)
                     Toast.makeText(
-                        applicationContext,
-                        "There are no Machine and Shop information found!, please click write data to write those!",
+                        this,
+                        "Data successfully written to NFC tag!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    ndef.close()
+                } catch (e: Exception) {
+                    Toast.makeText(
+                        this,
+                        "Failed to write data to NFC tag: ${e.message}",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
             }
-
-
         }
-
     }
 
+
+    // Disable foreground dispatch when the activity is paused
     override fun onPause() {
-        if (this.isFinishing) {
-            nfcAdapter?.disableForegroundDispatch(this)
-        }
         super.onPause()
+        if (nfcAdapter != null) {
+            nfcAdapter!!.disableForegroundDispatch(this)
+        }
+    }
+
+    // Enable foreground dispatch when the activity is resumed
+    override fun onResume() {
+        super.onResume()
+        enableForegroundDispatch()
     }
 }

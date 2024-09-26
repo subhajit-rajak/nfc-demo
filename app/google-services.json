@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "440208053506",
+    "project_id": "nfc-demo-b49d4",
+    "storage_bucket": "nfc-demo-b49d4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440208053506:android:56a053b45d076f57511e1b",
+        "android_client_info": {
+          "package_name": "com.subhajitrajak.nfcdemo"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWj27LE7ERVadhg7BINw1KF51nS4KP5UQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
