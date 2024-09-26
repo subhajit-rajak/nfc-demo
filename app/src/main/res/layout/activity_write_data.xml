@@ -8,7 +8,7 @@
     android:background="@color/white"
     tools:context=".WriteData">
 
-    <LinearLayout
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_above="@id/input_group"
@@ -18,23 +18,31 @@
         android:gravity="center"
         android:orientation="vertical">
 
-        <TextView
+        <com.airbnb.lottie.LottieAnimationView
+            android:id="@+id/webView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif"
-            android:text="Write NFC Data"
-            android:textSize="20sp" />
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:lottie_autoPlay="true"
+            app:lottie_loop="true"
+            app:lottie_rawRes="@raw/nfc_ripple_anim" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:padding="16dp"
-            android:text="Enter the text in the below text box and bring the nfc tag near!"
+            android:text="Tap"
             android:textAlignment="center"
-            android:textSize="16sp" />
+            android:textSize="20sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
 
-    </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <LinearLayout
         android:id="@+id/input_group"
@@ -48,42 +56,30 @@
         android:orientation="vertical">
 
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:padding="16dp"
+            android:text="Enter the food name and tap your phone on the nfc tag near!"
+            android:textAlignment="center"
+            android:textSize="16sp" />
+
         <EditText
-            android:id="@+id/txtshopid"
+            android:id="@+id/txtmenuid"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:hint="Shop ID"
-            android:inputType="textPersonName"
-            android:padding="15dp" />
-
-        <EditText
-            android:id="@+id/txtmachineid"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="10dp"
-            android:hint="Machine ID"
-            android:inputType="textPersonName"
-            android:padding="15dp" />
-
-
-        <Button
-            android:id="@+id/btnback"
-            style="@style/Widget.Material3.Button.IconButton.Outlined"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:foreground="?android:attr/selectableItemBackground"
-            android:text="Read NFC!"
-            android:textAllCaps="false"
-            android:textColor="#0099ff"
-            android:textSize="17sp" />
+            android:hint="Food name"
+            android:inputType="text"
+            android:padding="15dp"
+            tools:ignore="Autofill" />
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
-            android:text="Testing Purposes"
+            android:text="Only for testing purposes"
             android:textAlignment="textEnd"
             android:textSize="13sp" />
 
