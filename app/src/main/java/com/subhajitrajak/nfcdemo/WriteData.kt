@@ -39,20 +39,12 @@ class WriteData : AppCompatActivity() {
         setContentView(binding.root)
         enableEdgeToEdge()
 
-        // Initialize Firebase Database
-        database = FirebaseDatabase.getInstance().reference
-
-        binding.btnback.setOnClickListener {
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
-        }
-
-        // Prepare PendingIntent for NFC
+        // prepare pending Intent
+        val intent = Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), PendingIntent.FLAG_MUTABLE)
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_MUTABLE)
         } else {
-            PendingIntent.getActivity(this, 0, Intent(this, javaClass).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP),
-                PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
+            PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_ONE_SHOT or PendingIntent.FLAG_IMMUTABLE)
         }
 
         val ndef = IntentFilter(NfcAdapter.ACTION_NDEF_DISCOVERED)
@@ -96,6 +88,26 @@ class WriteData : AppCompatActivity() {
         myDialog.show()
     }
 
+    private fun showNfcDisabledDialog() {
+        val builder = AlertDialog.Builder(this@WriteData, R.style.MyAlertDialogStyle)
+        builder.setTitle("NFC Disabled")
+        builder.setMessage("Please Enable NFC")
+        builder.setPositiveButton("Settings") { _, _ -> startActivity(Intent(Settings.ACTION_NFC_SETTINGS)) }
+        builder.setNegativeButton("Cancel", null)
+        val myDialog = builder.create()
+        myDialog.setCanceledOnTouchOutside(false)
+        myDialog.show()
+    }
+
+    private fun showNfcNotSupportedDialog() {
+        val builder = AlertDialog.Builder(this@WriteData, R.style.MyAlertDialogStyle)
+        builder.setMessage("This device doesn't support NFC.")
+        builder.setPositiveButton("Cancel", null)
+        val myDialog = builder.create()
+        myDialog.setCanceledOnTouchOutside(false)
+        myDialog.show()
+    }
+
     override fun onResume() {
         super.onResume()
         nfcAdapter?.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, techListsArray)
@@ -104,40 +116,36 @@ class WriteData : AppCompatActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         try {
-            // Check if both text fields are filled
-            if (binding.txtmachineid.text.toString().isNotEmpty() && binding.txtshopid.text.toString().isNotEmpty()) {
-                val shopid = binding.txtshopid.text.toString()
-                val machineid = binding.txtmachineid.text.toString()
-
-                // Handle NFC action
+            val shopId="restaurant"
+            val menuId=binding.txtmenuid.text.toString()
+            if(menuId != "") {
                 if (NfcAdapter.ACTION_TECH_DISCOVERED == intent.action
-                    || NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action) {
-
+                    || NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action
+                ) {
                     val tag = intent.getParcelableExtra<Tag>(NfcAdapter.EXTRA_TAG) ?: return
                     val ndef = Ndef.get(tag) ?: return
 
                     if (ndef.isWritable) {
-                        // Create NDEF message with shop ID and machine ID
                         val message = NdefMessage(
                             arrayOf(
-                                NdefRecord.createTextRecord("en", shopid),
-                                NdefRecord.createTextRecord("en", machineid)
+                                NdefRecord.createTextRecord("en", shopId),
+                                NdefRecord.createTextRecord("en", menuId)
                             )
                         )
 
-                        // Write message to NFC tag
                         ndef.connect()
                         ndef.writeNdefMessage(message)
                         ndef.close()
 
-                        Toast.makeText(applicationContext, "Successfully written to NFC tag!", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(applicationContext, "Successfully Written!", Toast.LENGTH_SHORT).show()
                     }
                 }
             } else {
-                Toast.makeText(applicationContext, "Please fill in both text fields.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, "Write on text box!", Toast.LENGTH_SHORT).show()
             }
-        } catch (ex: Exception) {
-            Toast.makeText(applicationContext, ex.message, Toast.LENGTH_SHORT).show()
+        }
+        catch (e:Exception) {
+            Toast.makeText(applicationContext, e.message, Toast.LENGTH_SHORT).show()
         }
     }
 
