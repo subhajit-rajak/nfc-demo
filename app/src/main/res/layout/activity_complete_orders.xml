@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#F6F6F6"
-    tools:context=".MainActivity">
+    tools:context=".CompleteOrders">
 
     <TextView
         android:id="@+id/textView"
@@ -14,34 +14,12 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
         android:layout_marginTop="64dp"
-        android:text="Orders &amp;\nPayment History"
+        android:text="Complete Orders"
         android:textColor="#010101"
         android:textSize="24sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
-
-    <ImageView
-        android:id="@+id/completeOrdersBtn"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="24dp"
-        android:src="@drawable/complete_orders"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/textView"
-        tools:ignore="ContentDescription" />
-
-    <ImageView
-        android:id="@+id/menuBtn"
-        android:layout_width="32dp"
-        android:layout_height="32dp"
-        android:layout_marginEnd="16dp"
-        android:src="@drawable/menus"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
-        app:layout_constraintEnd_toStartOf="@id/completeOrdersBtn"
-        app:layout_constraintTop_toTopOf="@+id/textView"
-        tools:ignore="ContentDescription" />
 
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/materialCardView"
@@ -180,22 +158,5 @@
                 android:textSize="16sp" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
-
-    <Button
-        android:id="@+id/enterMenu"
-        style="@style/Widget.Material3.Button.IconButton.Outlined"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="32dp"
-        android:focusable="false"
-        android:text="Accept Payment"
-        android:textAllCaps="false"
-        android:textColor="#000000"
-        android:textSize="17sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

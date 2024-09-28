@@ -86,8 +86,8 @@ class WriteData : AppCompatActivity() {
         super.onNewIntent(intent)
         try {
             val shopId="restaurant"
-            val menuId=binding.txtmenuid.text.toString()
-            if(menuId != "") {
+            val amount=binding.txtamount.text.toString()
+            if(amount != "") {
                 if (NfcAdapter.ACTION_TECH_DISCOVERED == intent.action
                     || NfcAdapter.ACTION_NDEF_DISCOVERED == intent.action
                 ) {
@@ -98,7 +98,7 @@ class WriteData : AppCompatActivity() {
                         val message = NdefMessage(
                             arrayOf(
                                 NdefRecord.createTextRecord("en", shopId),
-                                NdefRecord.createTextRecord("en", menuId)
+                                NdefRecord.createTextRecord("en", amount)
                             )
                         )
 
