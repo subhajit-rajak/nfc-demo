@@ -16,6 +16,12 @@
         android:theme="@style/Theme.NFCDemo"
         tools:targetApi="31">
         <activity
+            android:name=".CompleteOrders"
+            android:exported="false" />
+        <activity
+            android:name=".MenuActivity"
+            android:exported="false" />
+        <activity
             android:name=".TempActivity"
             android:exported="false" />
         <activity

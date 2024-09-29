@@ -61,16 +61,16 @@
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif"
             android:padding="16dp"
-            android:text="Enter the food name and tap your phone on the nfc tag near!"
+            android:text="Enter the amount and tap your phone on the nfc tag near!"
             android:textAlignment="center"
             android:textSize="16sp" />
 
         <EditText
-            android:id="@+id/txtmenuid"
+            android:id="@+id/txtamount"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="10dp"
-            android:hint="Food name"
+            android:hint="Enter Amount"
             android:inputType="text"
             android:padding="15dp"
             tools:ignore="Autofill" />
